@@ -2,18 +2,24 @@ package com.example.vamosrachar
 
 import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import org.w3c.dom.Text
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var textToSpeech:TextToSpeech
+
     private var valorDaConta = 0.0
     private var pessoas = 0
     private var valorFinal = 0.0
@@ -26,6 +32,15 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        textToSpeech = TextToSpeech(this){status ->
+            if (status == TextToSpeech.SUCCESS) {
+                val result = textToSpeech.setLanguage(Locale.getDefault())
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Toast.makeText(this, "language is not supported", Toast.LENGTH_LONG).show()
+                }
+            }
         }
 
         findViewById<EditText>(R.id.valorDaConta).addTextChangedListener(object: TextWatcher{
@@ -97,6 +112,12 @@ class MainActivity : AppCompatActivity() {
 
             val shareIntent = Intent.createChooser(sendIntent, null)
             startActivity(shareIntent)
+        }
+
+        findViewById<ImageButton>(R.id.ouvir).setOnClickListener{
+            val v = String.format("R$ %.2f", valorFinal)
+            val txt = "Sua parte da conta é $v"
+            textToSpeech.speak(txt, TextToSpeech.QUEUE_FLUSH, null, null)
         }
     }
 
