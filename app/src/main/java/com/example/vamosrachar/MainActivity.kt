@@ -1,10 +1,12 @@
 package com.example.vamosrachar
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -83,6 +85,19 @@ class MainActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.valorFinal).text = valorFinalStr
             }
         })
+
+        findViewById<ImageButton>(R.id.compartilhar).setOnClickListener{
+            val v = String.format("R$ %.2f", valorFinal)
+            val txt = "Sua parte da conta: $v"
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, txt)
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+        }
     }
 
     fun calculate(value: Double, participants: Int): Double {
